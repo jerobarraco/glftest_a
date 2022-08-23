@@ -10,7 +10,7 @@ public:
 	dimension stride = 0;
 	dimension toIndex();
 
-	void fromIndex(dimension index);
+	void fromIndex(dimension index, dimension pStride);
 };
 
 #endif // COORD_H
