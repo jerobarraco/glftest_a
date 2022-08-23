@@ -23,9 +23,11 @@ void Minefield::GenerateMineField(dimension width, dimension height, dimension c
 
 	// reset and clear the field
 	_field.resize(size);
+	_fieldState.resize(size);
 	for (dimension i=0; i<size; ++i){
 		// initialization is not super important the 1st time, but in case the user calls this function again.
 		_field[i] = Cell::EMPTY;
+		_fieldState[i] = CellState::CLOSED;
 		mine_indexes[i] = i;
 	}
 
@@ -42,7 +44,7 @@ void Minefield::GenerateMineField(dimension width, dimension height, dimension c
 	}
 }
 
-void Minefield::Print()
+void Minefield::Print(bool debug)
 {
 	Coord coord;
 	coord.stride = _width;
@@ -51,17 +53,45 @@ void Minefield::Print()
 		coord.x = x;
 		for (dimension y = 0; y<_height; ++y) {
 			coord.y = y;
-			Cell cell = _field[coord.toIndex()];
-			std::cout << CELL_CHARS[static_cast<int>(cell)];
+			dimension index = coord.toIndex();
+			CellState state = _fieldState[index];
+			if (state == CellState::OPEN || debug) {
+				Cell cell = _field[index];
+				std::cout << CELL_CHARS[static_cast<int>(cell)];
+			} else if (state == CellState::CLOSED) {
+				std::cout << "_";
+			}else if (state == CellState::MARKED){
+				std::cout << "X";
+			}
 		}
 		std::cout<<std::endl;
 	}
 }
 
+Cell Minefield::Open(dimension x, dimension y)
+{
+	if (x >= _width || y>= _height) {
+		std::cout << "Warning: Attempted to open a cell out of bounds."<< std::endl;
+		return Cell::EMPTY;
+	}
+	Cell cell = GetCellAt(x, y);
+	return cell;
+}
+
+Cell Minefield::GetCellAt(dimension x, dimension y) const
+{
+	if (x >= _width || y>= _height) return Cell::EMPTY;
+	Coord coord;
+	coord.x = x;
+	coord.y = y;
+	coord.stride = _width;
+	return _field[coord.toIndex()];
+}
+
 void Minefield::SetMine(dimension index)
 {
 	if (index >= _field.size()) {
-		std::cout << "Warning: Attempted to set a mine on an invalid index;"<< std::endl;
+		std::cout << "Warning: Attempted to set a mine on an invalid index."<< std::endl;
 		return;
 	}
 
@@ -78,14 +108,11 @@ void Minefield::SetMine(dimension index)
 	// go from -1 to +1 in both directions
 	// i could have embedded this into the for, i would also need to increase the size of the type to make it signed safely.
 	// and would make the logic a bit more complex
-	dimension min_x = coord.x > 0 ? coord.x-1: 0;
-	dimension min_y = coord.y > 0 ? coord.y-1: 0;
-	dimension max_x = coord.x < _width-1 ? coord.x+1: coord.x;
-	dimension max_y = coord.y < _height-1 ? coord.y+1: coord.y;
-
-	for (dimension mx = min_x; mx <= max_x; ++mx) {
+	Coord min, max;
+	coord.adjacents(_width, _height, min, max);
+	for (dimension mx = min.x; mx <= max.x; ++mx) {
 		coord_to.x = mx;
-		for (dimension my = min_y; my<= max_y; ++my) {
+		for (dimension my = min.y; my<= max.y; ++my) {
 			coord_to.y = my;
 			CountMine(coord_to.toIndex());
 		}
@@ -100,7 +127,7 @@ void Minefield::CountMine(dimension index) {
 
 	Cell cell = _field[index];
 	if (cell == Cell::MINE){
-		std::cout << "Attempted to count a mine on a mine."<< std::endl;
+		// Not an error. If the cell has a mine don't count anything.
 		return;
 	}
 

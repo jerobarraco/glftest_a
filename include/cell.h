@@ -24,4 +24,10 @@ enum Cell {
     MINE,
 };
 
+enum CellState{
+	CLOSED,
+	OPEN,
+	MARKED
+};
+
 #endif // CELL_H
