@@ -5,8 +5,6 @@ project(glftest_a LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#file(GLOB Src_Public RELATIVE "include/" "*.h")
-#file(GLOB Src_Private RELATIVE "src/" "*.cpp")
 file(GLOB SOURCES "include/*.h" "src/*.cpp")
 
 add_executable(glftest_a src/main.cpp ${SOURCES})

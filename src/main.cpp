@@ -1,28 +1,54 @@
 #include <iostream>
+#include <memory>
 
 #include "../include/minefield.h"
-
-using namespace std;
-
+#include "../include/solver.h"
 
 int main()
 {
-	Minefield mf;
-	mf.GenerateMineField(10, 10, 10);
-//	mf.Print();
+	std::shared_ptr<Minefield> field = std::make_shared<Minefield>();
+
+	int width=5, height=5, count=5;
+	/*
+	std::cout << "Hello, enter your preferences: " << std::endl;
+	std::cout << "\twidth= ";
+	std::cin >> width;
+	std::cout << "\theight= ";
+	std::cin >> height;
+	std::cout << "\tcount= ";
+	std::cin >> count;
+*/
+	field->GenerateMineField(width, height, count);
+//	field.Print();
 	int x, y;
+
+	Solver solver(field);
+
+
+
+	return 0;
 	while(true) {
-		cout << std::endl<<"Try it: x=";
-		cin >> x;
-		if(cin.eof())
+		std::cout << std::endl<<"Try it" << std::endl;
+		std::cout << "x=";
+		std::cin >> x;
+		if(std::cin.eof())
 			break;
 
-		cout << " y=";
-		cin >> y;
-		if(cin.eof())
+		std::cout << " y=";
+		std::cin >> y;
+		if(std::cin.eof())
 			break;
-		mf.Open(x, y);
-		mf.Print();
+
+		Cell cell = field->Open(x, y);
+		field->Print();
+		if (cell == Cell::MINE) {
+			std::cout << "You're dead game over"<< std::endl;
+			break;
+		}
+		if (field->IsSolved()) {
+			std::cout << "You've solved the game! but it still game over" << std::endl;
+			break;
+		}
 	}
     return 0;
 }
