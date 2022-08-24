@@ -8,7 +8,7 @@ typedef unsigned int dimension;
 static const char CELL_CHARS[] = ".12345678M";
 
 enum Cell {
-    EMPTY,
+	EMPTY = 0,
     M1,
     M2,
     M3,

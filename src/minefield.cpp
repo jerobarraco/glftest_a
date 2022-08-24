@@ -92,6 +92,7 @@ Cell Minefield::Open(dimension x, dimension y, bool justFlag)
 		return cell;
 	}
 
+	// important to mark as open even when dead
 	_fieldState[index] = CellState::OPEN;
 
 	// actually try to open
@@ -139,7 +140,7 @@ bool Minefield::IsDead() const
 }
 
 CellState Minefield::GetStateAt(dimension x, dimension y) const {
-	if (x>=_width || y>=_width) return CellState::CLOSED;
+	if (x>=_width || y>=_height) return CellState::CLOSED;
 	Coord coord;
 	coord.x = x;
 	coord.y = y;
@@ -148,7 +149,7 @@ CellState Minefield::GetStateAt(dimension x, dimension y) const {
 
 bool Minefield::PeekCellAt(dimension x, dimension y, Cell &cell) const
 {
-	if (x>=_width || y>=_width) return false;
+	if (x>=_width || y>=_height) return false;
 
 	CellState state = GetStateAt(x, y);
 	if (state != CellState::OPEN) return false;

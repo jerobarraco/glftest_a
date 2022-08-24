@@ -10,15 +10,16 @@ int main()
 	std::srand(std::time(0));
 	std::shared_ptr<Minefield> field = std::make_shared<Minefield>();
 
-	int width=5;
-	int height=5;
-	int count=3;
+	int width=10;
+	int height=10;
+	int count=10;
+
 	field->GenerateMineField(width, height, count);
+	std::cout << "Solution: " << std::endl;
 	field->Print(true);
-	int x, y;
+	std::cout <<  "----------" << std::endl;
 
 	Solver solver(field);
-
 	bool isDead = false;
 	while(!field->IsSolved() && !isDead) {
 		std::cout << std::endl;

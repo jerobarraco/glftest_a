@@ -11,7 +11,6 @@ public:
 
 	void fromIndex(dimension index, dimension pStride);
 	void adjacents(dimension width, dimension height, Coord& min, Coord& max);
-
 };
 
 #endif // COORD_H
