@@ -1,11 +1,13 @@
 #include <iostream>
 #include <memory>
+#include <ctime>
 
 #include "../include/minefield.h"
 #include "../include/solver.h"
 
 int main()
 {
+	std::srand(std::time(0));
 	std::shared_ptr<Minefield> field = std::make_shared<Minefield>();
 
 	int width=5, height=5, count=5;
@@ -24,9 +26,13 @@ int main()
 
 	Solver solver(field);
 
-
+	while(!field->IsSolved()) {
+		solver.Step();
+		field->Print();
+	}
 
 	return 0;
+
 	while(true) {
 		std::cout << std::endl<<"Try it" << std::endl;
 		std::cout << "x=";

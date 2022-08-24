@@ -11,7 +11,12 @@ public:
 	void Print(bool debug = false);
 
 	Cell Open(dimension x, dimension y, bool justFlag = false); // i could use a Coord but it was defined like this
-	bool IsSolved();
+	bool IsSolved() const;
+	CellState GetStateAt(dimension x, dimension y) const;
+	bool PeekCellAt(dimension x, dimension y, Cell &cell) const;
+
+	inline dimension GetWidth () { return _width; }
+	inline dimension GetHeight() { return _height; }
 
 protected:
 	void SetMine(dimension index);

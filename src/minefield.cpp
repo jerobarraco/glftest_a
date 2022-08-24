@@ -116,7 +116,7 @@ Cell Minefield::Open(dimension x, dimension y, bool justFlag)
 	return cell;
 }
 
-bool Minefield::IsSolved()
+bool Minefield::IsSolved() const
 {
 	for (dimension i=0; i<_field.size(); ++i) {
 		bool isMine = _field[i] == Cell::MINE;
@@ -125,6 +125,25 @@ bool Minefield::IsSolved()
 		bool unsolved = isMine ? state != CellState::FLAGGED : state != CellState::OPEN;
 		if (unsolved) return false;
 	}
+	return true;
+}
+
+CellState Minefield::GetStateAt(dimension x, dimension y) const {
+	if (x>=_width || y>=_width) return CellState::CLOSED;
+	Coord coord;
+	coord.x = x;
+	coord.y = y;
+	return _fieldState[coord.toIndex(_width)];
+}
+
+bool Minefield::PeekCellAt(dimension x, dimension y, Cell &cell) const
+{
+	if (x>=_width || y>=_width) return false;
+
+	CellState state = GetStateAt(x, y);
+	if (state != CellState::OPEN) return false;
+
+	cell = GetCellAt(x, y);
 	return true;
 }
 
