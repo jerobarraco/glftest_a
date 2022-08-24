@@ -2,7 +2,7 @@
 
 #include <algorithm> // for randomization
 #include <random> // for shuffling
-#include <iostream>
+#include <iostream> // for messages
 
 #include "../include/coord.h"
 
@@ -18,9 +18,10 @@ void Solver::Step()
 	dimension height = _field->GetHeight();
 
 	// identify bombs
-	for (dimension x = 0; x<width; ++x){
-		for (dimension y= 0; y<height; ++y) {
-			if (TryAddFlag(x, y)) return;
+	Coord coord;
+	for (coord.x = 0; coord.x<width; ++coord.x){
+		for (coord.y= 0; coord.y<height; ++coord.y) {
+			if (TryAddFlag(coord)) return;
 		}
 	}
 
@@ -28,13 +29,13 @@ void Solver::Step()
 	TryPickRandom();
 }
 
-bool Solver::TryAddFlag(dimension x, dimension y) const {
+bool Solver::TryAddFlag(Coord pos) const {
 	// If a tile has the same amount of hidden squares around it as unflagged bombs remaining around it, then all the hidden squares are bombs.
-	CellState state = _field->GetStateAt(x, y);
+	CellState state = _field->GetStateAt(pos.x, pos.y);
 	// we need it to be open (not flagged nor closed)
 	if (state != CellState::OPEN) return false;
 	Cell cell;
-	bool peekOk = _field->PeekCellAt(x, y, cell);
+	bool peekOk = _field->PeekCellAt(pos.x, pos.y, cell);
 	if (!peekOk) return false;
 	// actually dead
 	if (cell == Cell::MINE) return true;
@@ -47,19 +48,20 @@ bool Solver::TryAddFlag(dimension x, dimension y) const {
 
 	CellState adjState;
 	Coord min, max, coord;
-	coord.x = x;
-	coord.y = y;
+	coord = pos; // should copy it
 	coord.adjacents(_field->GetWidth(), _field->GetHeight(), min, max);
-	for (dimension mx = min.x; mx <= max.x; ++mx) {
-		for (dimension my = min.y; my<= max.y; ++my) {
-			adjState = _field->GetStateAt(mx, my);
+	// count the amount of possible mines adjacent to this cell
+	for (coord.x = min.x; coord.x <= max.x; ++coord.x) {
+		for (coord.y = min.y; coord.y<= max.y; ++coord.y) {
+			adjState = _field->GetStateAt(coord.x, coord.y);
 			if (adjState != CellState::OPEN) {
 				++mineCount;
 			}
 		}
 	}
 
-	int targetCount = static_cast<int>(cell);
+	dimension targetCount = static_cast<int>(cell);
+
 //	std::cout << "Minecount "<< x << ","<< y <<  " "<<  targetCount << ":" << mineCount << std::endl;
 	// if it has more or less covered. then were not sure
 	if (mineCount != targetCount) return false;

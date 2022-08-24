@@ -10,7 +10,7 @@ public:
 	void GenerateMineField(dimension width, dimension height, dimension count);
 	void Print(bool debug = false);
 
-	Cell Open(dimension x, dimension y, bool justFlag = false); // i could use a Coord but it was defined like this
+	Cell Open(dimension x, dimension y, bool justFlag = false);
 	bool IsSolved() const;
 	bool IsDead() const;
 
@@ -34,5 +34,8 @@ private:
 // i could have used a shared_ptr for dynamic array on the field which would have been probably a bit more performant.
 // but it would have increased the complexity of the code. we wouldn't be able to rely on the std functions.
 // and would increase the cognitive cost of the project(tm) (e.g. juniors would have more difficulty with it, and be prone to introduce problems)
+
+// Also i could have used Coord as a parameter type for these functions, which would have made them cleaner, as well as the logic inside.
+// but since they were defined like that, i was reluctant to diverge.
 
 #endif // MINEFIELD_H
