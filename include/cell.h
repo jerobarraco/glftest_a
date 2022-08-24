@@ -27,7 +27,7 @@ enum Cell {
 enum CellState{
 	CLOSED,
 	OPEN,
-	MARKED
+	FLAGGED
 };
 
 #endif // CELL_H

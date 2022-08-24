@@ -47,20 +47,19 @@ void Minefield::GenerateMineField(dimension width, dimension height, dimension c
 void Minefield::Print(bool debug)
 {
 	Coord coord;
-	coord.stride = _width;
 
 	for (dimension x = 0; x<_width; ++x){
 		coord.x = x;
 		for (dimension y = 0; y<_height; ++y) {
 			coord.y = y;
-			dimension index = coord.toIndex();
+			dimension index = coord.toIndex(_width);
 			CellState state = _fieldState[index];
 			if (state == CellState::OPEN || debug) {
 				Cell cell = _field[index];
 				std::cout << CELL_CHARS[static_cast<int>(cell)];
 			} else if (state == CellState::CLOSED) {
 				std::cout << "_";
-			}else if (state == CellState::MARKED){
+			}else if (state == CellState::FLAGGED){
 				std::cout << "X";
 			}
 		}
@@ -68,13 +67,52 @@ void Minefield::Print(bool debug)
 	}
 }
 
-Cell Minefield::Open(dimension x, dimension y)
+Cell Minefield::Open(dimension x, dimension y, bool justFlag)
 {
+	std::cout << "Opening " << x << "."<< y<< std::endl;
 	if (x >= _width || y>= _height) {
 		std::cout << "Warning: Attempted to open a cell out of bounds."<< std::endl;
 		return Cell::EMPTY;
 	}
+
 	Cell cell = GetCellAt(x, y);
+	Coord coord;
+	coord.x = x;
+	coord.y = y;
+
+	dimension index = coord.toIndex(_width);
+	CellState state = _fieldState[index];
+	if (state == CellState::OPEN) {
+		// Cell already opened not doing that again
+		return cell;
+	}
+
+	if(justFlag) {
+		_fieldState[index] = CellState::FLAGGED;
+		return cell;
+	}
+
+	_fieldState[index] = CellState::OPEN;
+
+	// actually try to open
+	if (cell == Cell::MINE) {
+		std::cout << "BOOM! You're dead" << std::endl;
+		return cell;
+	}
+
+	if (cell != Cell::EMPTY) return cell;
+
+	// lets automagically open the adjacents, only happens for empty cells
+	Coord min, max, coord_to;
+	coord.adjacents(_width, _height, min, max);
+	for (dimension mx = min.x; mx <= max.x; ++mx) {
+		coord_to.x = mx;
+		for (dimension my = min.y; my<= max.y; ++my) {
+			coord_to.y = my;
+			Open(coord_to.x, coord_to.y, false);
+		}
+	}
+
 	return cell;
 }
 
@@ -84,8 +122,7 @@ Cell Minefield::GetCellAt(dimension x, dimension y) const
 	Coord coord;
 	coord.x = x;
 	coord.y = y;
-	coord.stride = _width;
-	return _field[coord.toIndex()];
+	return _field[coord.toIndex(_width)];
 }
 
 void Minefield::SetMine(dimension index)
@@ -99,7 +136,6 @@ void Minefield::SetMine(dimension index)
 	coord.fromIndex(index, _width);
 
 	Coord coord_to;
-	coord_to.stride = _width;
 
 	// mark current cell as mined
 	_field[index] = Cell::MINE;
@@ -114,7 +150,7 @@ void Minefield::SetMine(dimension index)
 		coord_to.x = mx;
 		for (dimension my = min.y; my<= max.y; ++my) {
 			coord_to.y = my;
-			CountMine(coord_to.toIndex());
+			CountMine(coord_to.toIndex(_width));
 		}
 	}
 }
