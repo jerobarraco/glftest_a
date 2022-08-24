@@ -69,7 +69,7 @@ void Minefield::Print(bool debug)
 
 Cell Minefield::Open(dimension x, dimension y, bool justFlag)
 {
-//	std::cout << "Opening " << x << "."<< y<< std::endl;
+//	std::cout << "Opening " << x << ","<< y<< std::endl;
 	if (x >= _width || y>= _height) {
 		std::cout << "Warning: Attempted to open a cell out of bounds."<< std::endl;
 		return Cell::EMPTY;
@@ -126,6 +126,16 @@ bool Minefield::IsSolved() const
 		if (unsolved) return false;
 	}
 	return true;
+}
+
+bool Minefield::IsDead() const
+{
+	for (dimension i=0; i<_field.size(); ++i) {
+		bool isMine = _field[i] == Cell::MINE;
+		CellState state = _fieldState[i];
+		if (isMine && state == CellState::OPEN) return true;
+	}
+	return false;
 }
 
 CellState Minefield::GetStateAt(dimension x, dimension y) const {

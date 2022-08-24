@@ -12,6 +12,8 @@ public:
 
 	Cell Open(dimension x, dimension y, bool justFlag = false); // i could use a Coord but it was defined like this
 	bool IsSolved() const;
+	bool IsDead() const;
+
 	CellState GetStateAt(dimension x, dimension y) const;
 	bool PeekCellAt(dimension x, dimension y, Cell &cell) const;
 

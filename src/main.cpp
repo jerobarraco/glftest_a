@@ -10,51 +10,23 @@ int main()
 	std::srand(std::time(0));
 	std::shared_ptr<Minefield> field = std::make_shared<Minefield>();
 
-	int width=5, height=5, count=5;
-	/*
-	std::cout << "Hello, enter your preferences: " << std::endl;
-	std::cout << "\twidth= ";
-	std::cin >> width;
-	std::cout << "\theight= ";
-	std::cin >> height;
-	std::cout << "\tcount= ";
-	std::cin >> count;
-*/
+	int width=5;
+	int height=5;
+	int count=3;
 	field->GenerateMineField(width, height, count);
-//	field.Print();
+	field->Print(true);
 	int x, y;
 
 	Solver solver(field);
 
-	while(!field->IsSolved()) {
+	bool isDead = false;
+	while(!field->IsSolved() && !isDead) {
+		std::cout << std::endl;
 		solver.Step();
 		field->Print();
+		isDead = field->IsDead();
 	}
 
+	std::cout << "Game over: " << (isDead ? "You lost" : "You won") << std::endl;
 	return 0;
-
-	while(true) {
-		std::cout << std::endl<<"Try it" << std::endl;
-		std::cout << "x=";
-		std::cin >> x;
-		if(std::cin.eof())
-			break;
-
-		std::cout << " y=";
-		std::cin >> y;
-		if(std::cin.eof())
-			break;
-
-		Cell cell = field->Open(x, y);
-		field->Print();
-		if (cell == Cell::MINE) {
-			std::cout << "You're dead game over"<< std::endl;
-			break;
-		}
-		if (field->IsSolved()) {
-			std::cout << "You've solved the game! but it still game over" << std::endl;
-			break;
-		}
-	}
-    return 0;
 }
